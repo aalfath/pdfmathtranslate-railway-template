@@ -4,7 +4,7 @@ PDFMathTranslate (pdf2zh) translates scientific PDFs while keeping the original 
 
 ## About Hosting PDFMathTranslate
 
-This template runs the official PDFMathTranslate 1.9.11 image (pinned by digest) with its Gradio web UI, behind a login. The username is `admin`, and the password is generated at deploy time: open the service's Variables tab and copy `WEB_PASSWORD`. A Railway volume at `/data` keeps saved settings, API keys you enter in the UI, the translation cache and recent files, so a redeploy or restart loses nothing. The document-layout model and fonts are baked into the image, so nothing is downloaded at runtime. Translation runs on CPU, since Railway has no GPU. Plan for 1 GB of RAM: the service starts in 0.5 GB and translates short documents there, but layout detection on a full research paper peaks at about 650 MB.
+This template runs the official PDFMathTranslate 1.9.11 image (pinned by digest) with its Gradio web UI, behind a login. The username is `admin`, and the password is generated at deploy time: open the service's Variables tab and copy `WEB_PASSWORD`. A Railway volume at `/data` keeps saved settings, API keys you enter in the UI, the translation cache and recent files, so a redeploy or restart loses nothing. The document-layout model and fonts are baked into the image, so nothing is downloaded at runtime. Translation runs on CPU, since Railway has no GPU. Give the service 1 GB of RAM (Hobby plan or higher): it starts and serves the UI in 0.5 GB, but layout detection during a translation needs more.
 
 ## Common Use Cases
 
@@ -32,7 +32,7 @@ One service, `pdfmathtranslate`, serves the web UI on Railway's public domain. A
 
 Variables: `WEB_PASSWORD` (generated login password), `WEB_USERNAME` (default `admin`), `PDF2ZH_DEFAULT_SERVICE` (service preselected in the UI, default `Bing`), `PDF2ZH_KEEP_DAYS` (days to keep uploaded and translated files, default 7). Change the password by editing `WEB_PASSWORD` and redeploying.
 
-RAM: tested on Railway, a 3-page arXiv paper took 91 s and peaked at about 650 MB, so give the service 1 GB (Hobby plan or higher). On a 0.5 GB service the UI runs, but a real paper is stopped for lack of memory; the template then exits non-zero and Railway restarts it. Updates: when we bump the version in the template's GitHub repo, Railway shows an update notice in your project; read the repo's CHANGELOG.md, then apply it.
+RAM: tested on Railway, a 3-page arXiv paper took 91 s and peaked at about 650 MB with a 1 GB limit. With a 0.5 GB limit (Free plan) the UI runs, but translations, even of one page, can be stopped for lack of memory; the service then exits non-zero and Railway restarts it within seconds. So use 1 GB to translate. Updates: when we bump the version in the template's GitHub repo, Railway shows an update notice in your project; read the repo's CHANGELOG.md, then apply it.
 
 ## Why Deploy PDFMathTranslate on Railway?
 
