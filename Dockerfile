@@ -9,6 +9,7 @@ ENV OMP_NUM_THREADS=1 \
     MALLOC_ARENA_MAX=2 \
     GRADIO_ANALYTICS_ENABLED=False \
     PDF2ZH_DATA_DIR=/data \
+    PDF2ZH_DEFAULT_SERVICE=Bing \
     PORT=7860
 
 COPY lowmem.py /usr/local/lib/pdf2zh-railway/lowmem.py

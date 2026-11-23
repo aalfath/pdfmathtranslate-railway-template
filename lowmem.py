@@ -5,7 +5,11 @@ model into their own onnxruntime session, through onnx.load() and
 SerializeToString(), with one thread per host core. That idles at ~690 MB and
 is OOM-killed at 0.5 GB. Here both share one session, loaded straight from the
 model file with ORT_NUM_THREADS threads (default 1), and freed heap memory is
-handed back to the OS. Behaviour is otherwise unchanged.
+handed back to the OS.
+
+It also preselects PDF2ZH_DEFAULT_SERVICE (default "Bing") in the web UI's
+Service list: Google's free endpoint often answers 429 to cloud IP addresses.
+Behaviour is otherwise unchanged.
 """
 import ast
 import ctypes
@@ -56,6 +60,27 @@ def patched_init(self, model_path):
     self._names = ast.literal_eval(meta["names"])
 
 
+def default_service():
+    """Preselect PDF2ZH_DEFAULT_SERVICE in the UI's Service dropdown."""
+    wanted = os.environ.get("PDF2ZH_DEFAULT_SERVICE", "Bing").strip().lower()
+    if not wanted:
+        return
+    try:
+        import gradio as gr
+        import pdf2zh.gui as gui
+
+        for block in gui.demo.blocks.values():
+            if isinstance(block, gr.Dropdown) and block.label == "Service":
+                for choice in block.choices:
+                    value = choice[1] if isinstance(choice, (tuple, list)) else choice
+                    if str(value).lower() == wanted:
+                        block.value = value
+                        print(f"Default translation service: {value}", flush=True)
+                        return
+    except Exception as exc:  # never block startup
+        print(f"Could not set the default service: {exc}", flush=True)
+
+
 def install():
     import babeldoc.docvision.doclayout as bd
     import pdf2zh.doclayout as pd
@@ -76,6 +101,7 @@ def install():
 if __name__ == "__main__":
     if os.environ.get("PDF2ZH_LOWMEM", "1") != "0":
         install()
+    default_service()
     from pdf2zh.pdf2zh import main
 
     sys.argv[0] = "pdf2zh"

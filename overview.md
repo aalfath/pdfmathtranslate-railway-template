@@ -1,6 +1,6 @@
 # Deploy and Host PDFMathTranslate on Railway
 
-PDFMathTranslate (pdf2zh) translates scientific PDFs while keeping the original layout: formulas, charts, tables, the table of contents and annotations stay in place. It writes a translated-only PDF and a side-by-side bilingual PDF. It works with free Google or Bing translation, or with your own LLM or translation API key.
+PDFMathTranslate (pdf2zh) translates scientific PDFs while keeping the original layout: formulas, charts, tables, the table of contents and annotations stay in place. It writes a translated-only PDF and a side-by-side bilingual PDF. It works with free Bing translation out of the box, or with your own LLM or translation API key.
 
 ## About Hosting PDFMathTranslate
 
@@ -27,10 +27,10 @@ This template runs the official PDFMathTranslate 1.9.11 image (pinned by digest)
 One service, `pdfmathtranslate`, serves the web UI on Railway's public domain. After deploy:
 
 1. Open the public URL and sign in as `admin` with the `WEB_PASSWORD` value from the Variables tab.
-2. Upload a PDF, pick the languages and a service, and press Translate. Google and Bing need no key.
+2. Upload a PDF, pick the languages and press Translate. The Service list starts on Bing, which needs no key. Google is also listed, but its free endpoint often answers 429 to cloud servers such as Railway, and the translation then stalls; use Bing or an API key instead.
 3. To use an LLM, pick it in the Service list and enter its API key in the UI (it is saved on the volume), or set it as a service variable, for example `OPENAI_API_KEY`, `OPENAI_BASE_URL` and `OPENAI_MODEL` for any OpenAI-compatible API.
 
-Variables: `WEB_PASSWORD` (generated login password), `WEB_USERNAME` (default `admin`), `PDF2ZH_KEEP_DAYS` (days to keep uploaded and translated files, default 7). Change the password by editing `WEB_PASSWORD` and redeploying.
+Variables: `WEB_PASSWORD` (generated login password), `WEB_USERNAME` (default `admin`), `PDF2ZH_DEFAULT_SERVICE` (service preselected in the UI, default `Bing`), `PDF2ZH_KEEP_DAYS` (days to keep uploaded and translated files, default 7). Change the password by editing `WEB_PASSWORD` and redeploying.
 
 Uploaded files are limited only by memory: on a 0.5 GB service, translate long papers in page ranges or raise the RAM. The template wraps the app so a crash exits non-zero and Railway restarts it. Updates: when we bump the version in the template's GitHub repo, Railway shows an update notice in your project; read the repo's CHANGELOG.md, then apply it.
 

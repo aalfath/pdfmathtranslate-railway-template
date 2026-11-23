@@ -8,3 +8,4 @@ First release.
 * Web UI behind a login (`admin` and a generated `WEB_PASSWORD`).
 * Settings, translation cache and files on the `/data` volume.
 * Starts within 0.5 GB of RAM: one shared single-threaded layout-model session.
+* Bing is the preselected translation service (Google's free endpoint answers 429 to Railway's IP addresses).
