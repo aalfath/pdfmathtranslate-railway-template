@@ -14,7 +14,7 @@ case "$USER_NAME$WEB_PASSWORD" in
   *,*) echo "WEB_USERNAME and WEB_PASSWORD must not contain a comma." >&2; exit 1 ;;
 esac
 
-mkdir -p "$DATA/config" "$DATA/cache" "$DATA/files" /root/.config /root/.cache
+mkdir -p "$DATA/config" "$DATA/cache" "$DATA/pdf2zh_files" /root/.config /root/.cache
 
 # Saved settings (~/.config/PDFMathTranslate) and the translation cache
 # (~/.cache/pdf2zh) live on the volume. The models and fonts baked into the
@@ -29,11 +29,13 @@ link() { # link <path> <target>
 mkdir -p "$DATA/config/PDFMathTranslate" "$DATA/cache/pdf2zh"
 link /root/.config/PDFMathTranslate "$DATA/config/PDFMathTranslate"
 link /root/.cache/pdf2zh "$DATA/cache/pdf2zh"
-link /app/pdf2zh_files "$DATA/files"
 
-# Uploaded and translated PDFs are kept for PDF2ZH_KEEP_DAYS days (default 7).
+# Uploaded and translated PDFs go to ./pdf2zh_files. The app runs from the
+# volume so that folder is a real directory under its working directory
+# (Gradio refuses to serve result files that resolve outside it).
+# They are kept for PDF2ZH_KEEP_DAYS days (default 7).
 KEEP_DAYS="${PDF2ZH_KEEP_DAYS:-7}"
-find "$DATA/files" -type f -mtime +"$KEEP_DAYS" -delete 2>/dev/null || true
+find "$DATA/pdf2zh_files" -type f -mtime +"$KEEP_DAYS" -delete 2>/dev/null || true
 
 # Login file for Gradio (one "user,password" line), rebuilt on every start
 # so a changed WEB_PASSWORD takes effect on the next deploy.
@@ -41,7 +43,7 @@ AUTH_FILE=/tmp/pdf2zh-users.txt
 umask 077
 printf '%s,%s\n' "$USER_NAME" "$WEB_PASSWORD" > "$AUTH_FILE"
 
-cd /app
+cd "$DATA"
 echo "Starting PDFMathTranslate on port $PORT (login user: $USER_NAME)"
 python /usr/local/lib/pdf2zh-railway/lowmem.py -i --serverport "$PORT" --authorized "$AUTH_FILE" &
 pid=$!
