@@ -50,7 +50,7 @@ By deploying PDFMathTranslate on Railway, you are one step closer to supporting 
 * `start.sh`: checks `WEB_PASSWORD`, links settings, cache and files onto `/data`, writes the login file, starts the web UI on `$PORT` and exits non-zero on any unexpected stop
 * `lowmem.py`: starts `pdf2zh` with one shared, single-threaded layout-model session (upstream loads the same model twice with one thread per host core, which idles at ~690 MB) and returns freed memory to the OS; set `PDF2ZH_LOWMEM=0` to turn it off
 
-Railway settings used by the template: health check path `/robots.txt` (answers without login), restart policy on failure, volume at `/data`.
+Railway settings used by the template: health check path `/` (the login page, answers 200 without signing in), restart policy on failure, volume at `/data`.
 
 ## Licence
 
